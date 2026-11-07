@@ -103,13 +103,10 @@
 </head>
 <body class="py-10 px-4 flex flex-col justify-center items-center">
 
-    <!-- Floating Music Toggle Button -->
-    <div class="mb-4 z-20">
-        <button onclick="toggleMusic()" id="music-btn" class="bg-white/90 backdrop-blur-md border border-autumn-300 text-autumn-800 px-4 py-2 rounded-full shadow-md text-xs font-mono font-bold flex items-center gap-2 hover:bg-autumn-100 transition">
-            <i id="music-icon" class="fa-solid fa-music text-autumn-600"></i>
-            <span id="music-text">Putar Musik Koto Jepang 🍁</span>
-        </button>
-    </div>
+    <!-- ELEMEN AUDIO AUTO-PLAY (Sudah diset ke lagujepang.mp3) -->
+    <audio id="bgm" autoplay loop preload="auto">
+        <source src="lagujepang.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- Container Daun Gugur -->
     <div id="leaves-container"></div>
@@ -135,7 +132,7 @@
                 </div>
                 <div class="flex justify-between text-maple font-semibold">
                     <span>Status:</span>
-                    <span>Rafa</span>
+                    <span>Rafa butuh uang buat jajan</span>
                 </div>
             </div>
         </div>
@@ -226,7 +223,7 @@
             <p class="text-xs text-autumn-600 font-mono mt-1">ありがとうございます 🌸</p>
 
             <div class="my-4 p-4 bg-autumn-50 rounded-xl border border-autumn-200 text-autumn-800 text-sm leading-relaxed">
-                "Makasih banyak ya Manda!"
+                "Makasih banyak ya Manda! ❤️ Duitnya udah Rafa terima, Manda memang yang terbaik!"
             </div>
 
             <button onclick="closeModal()" class="w-full bg-autumn-700 hover:bg-autumn-800 text-white font-bold py-2.5 rounded-xl transition text-sm">
@@ -238,55 +235,6 @@
     <!-- JavaScript Application Logic -->
     <script>
         let audioCtx;
-        let isPlaying = false;
-        let musicTimer = null;
-
-        const kotoNotes = [293.66, 329.63, 349.23, 440.00, 466.16, 587.33, 659.25, 698.46, 880.00];
-
-        function playKotoTone(freq, duration = 1.8) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-        }
-
-        function startJapaneseMelody() {
-            if (!isPlaying) return;
-            const randomNote = kotoNotes[Math.floor(Math.random() * kotoNotes.length)];
-            playKotoTone(randomNote, 2.0);
-            const nextDelay = Math.floor(Math.random() * 400) + 300;
-            musicTimer = setTimeout(startJapaneseMelody, nextDelay);
-        }
-
-        function toggleMusic() {
-            const musicText = document.getElementById('music-text');
-            const musicIcon = document.getElementById('music-icon');
-
-            if (!isPlaying) {
-                isPlaying = true;
-                startJapaneseMelody();
-                musicText.innerText = "Matikan Musik 🎵";
-                musicIcon.className = "fa-solid fa-volume-high text-maple animate-pulse";
-            } else {
-                isPlaying = false;
-                clearTimeout(musicTimer);
-                musicText.innerText = "Putar Musik Koto Jepang 🍁";
-                musicIcon.className = "fa-solid fa-music text-autumn-600";
-            }
-        }
 
         function playBeep(freq = 600, duration = 0.1) {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -303,6 +251,16 @@
             osc.start();
             osc.stop(audioCtx.currentTime + duration);
         }
+
+        // Trik Auto-play BGM saat halaman dibuka/disentuh pertama kali
+        window.addEventListener('load', () => {
+            const bgm = document.getElementById('bgm');
+            bgm.play().catch(() => {
+                document.body.addEventListener('click', () => {
+                    bgm.play();
+                }, { once: true });
+            });
+        });
 
         let items = [
             { name: "JGC 1", amount: 50000 },
@@ -405,6 +363,7 @@
             const modal = document.getElementById('success-modal');
             const content = document.getElementById('modal-content');
             
+            modal.classList.add('flex');
             modal.classList.remove('hidden');
             setTimeout(() => {
                 content.classList.remove('scale-95', 'opacity-0');
@@ -420,6 +379,7 @@
             content.classList.add('scale-95', 'opacity-0');
             
             setTimeout(() => {
+                modal.classList.remove('flex');
                 modal.classList.add('hidden');
             }, 200);
         }
