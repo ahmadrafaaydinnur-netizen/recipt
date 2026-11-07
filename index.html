@@ -103,8 +103,13 @@
 </head>
 <body class="py-10 px-4 flex flex-col justify-center items-center">
 
-    <!-- Auto Play Audio Player (Tersembunyi) -->
-    <iframe class="hidden" width="0" height="0" src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&loop=1&playlist=jfKfPfyJRdk" allow="autoplay"></iframe>
+    <!-- Floating Music Toggle Button -->
+    <div class="mb-4 z-20">
+        <button onclick="toggleMusic()" id="music-btn" class="bg-white/90 backdrop-blur-md border border-autumn-300 text-autumn-800 px-4 py-2 rounded-full shadow-md text-xs font-mono font-bold flex items-center gap-2 hover:bg-autumn-100 transition">
+            <i id="music-icon" class="fa-solid fa-music text-autumn-600"></i>
+            <span id="music-text">Putar Musik Koto Jepang 🍁</span>
+        </button>
+    </div>
 
     <!-- Container Daun Gugur -->
     <div id="leaves-container"></div>
@@ -116,7 +121,7 @@
         <div class="text-center pb-6 border-b-2 border-dashed border-autumn-300 relative">
             <div class="flex justify-between items-center mb-2">
                 <span class="hanko-stamp text-xs">秋 Aki</span>
-                <span class="text-xs text-autumn-600 font-mono tracking-widest uppercase">Japan Edition</span>
+                <span class="text-xs text-autumn-600 font-mono tracking-widest uppercase">Japan Autumn Edition</span>
                 <span class="text-lg">🍁</span>
             </div>
             
@@ -130,7 +135,7 @@
                 </div>
                 <div class="flex justify-between text-maple font-semibold">
                     <span>Status:</span>
-                    <span>Rafa butuh uang buat jajan</span>
+                    <span>Rafa</span>
                 </div>
             </div>
         </div>
@@ -230,7 +235,75 @@
         </div>
     </div>
 
+    <!-- JavaScript Application Logic -->
     <script>
+        let audioCtx;
+        let isPlaying = false;
+        let musicTimer = null;
+
+        const kotoNotes = [293.66, 329.63, 349.23, 440.00, 466.16, 587.33, 659.25, 698.46, 880.00];
+
+        function playKotoTone(freq, duration = 1.8) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function startJapaneseMelody() {
+            if (!isPlaying) return;
+            const randomNote = kotoNotes[Math.floor(Math.random() * kotoNotes.length)];
+            playKotoTone(randomNote, 2.0);
+            const nextDelay = Math.floor(Math.random() * 400) + 300;
+            musicTimer = setTimeout(startJapaneseMelody, nextDelay);
+        }
+
+        function toggleMusic() {
+            const musicText = document.getElementById('music-text');
+            const musicIcon = document.getElementById('music-icon');
+
+            if (!isPlaying) {
+                isPlaying = true;
+                startJapaneseMelody();
+                musicText.innerText = "Matikan Musik 🎵";
+                musicIcon.className = "fa-solid fa-volume-high text-maple animate-pulse";
+            } else {
+                isPlaying = false;
+                clearTimeout(musicTimer);
+                musicText.innerText = "Putar Musik Koto Jepang 🍁";
+                musicIcon.className = "fa-solid fa-music text-autumn-600";
+            }
+        }
+
+        function playBeep(freq = 600, duration = 0.1) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
         let items = [
             { name: "JGC 1", amount: 50000 },
             { name: "Tol 1", amount: 60000 },
@@ -280,18 +353,21 @@
                 nameInput.value = '';
                 amountInput.value = '';
                 renderItems();
+                playBeep(800, 0.08);
             }
         }
 
         function removeItem(index) {
             items.splice(index, 1);
             renderItems();
+            playBeep(400, 0.08);
         }
 
         function copyGoPay() {
             navigator.clipboard.writeText("081389918087");
             const btnText = document.getElementById('copy-btn-text');
             btnText.innerText = 'Tersalin!';
+            playBeep(900, 0.12);
 
             setTimeout(() => {
                 btnText.innerText = 'Salin';
@@ -317,6 +393,8 @@
         }
 
         function triggerSuccessModal() {
+            playBeep(1000, 0.2);
+
             confetti({
                 particleCount: 80,
                 spread: 70,
