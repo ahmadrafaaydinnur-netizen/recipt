@@ -103,18 +103,8 @@
 </head>
 <body class="py-10 px-4 flex flex-col justify-center items-center">
 
-    <!-- Audio BGM (Japanese Lofi / Acoustic Chill) -->
-    <audio id="bgm-audio" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- Floating Music Toggle Button -->
-    <div class="mb-4 z-20">
-        <button onclick="toggleMusic()" id="music-btn" class="bg-white/80 backdrop-blur-md border border-autumn-300 text-autumn-800 px-4 py-2 rounded-full shadow-md text-xs font-mono font-bold flex items-center gap-2 hover:bg-autumn-100 transition">
-            <i id="music-icon" class="fa-solid fa-music text-autumn-600"></i>
-            <span id="music-text">Putar Musik Jepang 🍁</span>
-        </button>
-    </div>
+    <!-- Auto Play Audio Player (Tersembunyi) -->
+    <iframe class="hidden" width="0" height="0" src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&loop=1&playlist=jfKfPfyJRdk" allow="autoplay"></iframe>
 
     <!-- Container Daun Gugur -->
     <div id="leaves-container"></div>
@@ -126,7 +116,7 @@
         <div class="text-center pb-6 border-b-2 border-dashed border-autumn-300 relative">
             <div class="flex justify-between items-center mb-2">
                 <span class="hanko-stamp text-xs">秋 Aki</span>
-                <span class="text-xs text-autumn-600 font-mono tracking-widest uppercase">Japan Recipt</span>
+                <span class="text-xs text-autumn-600 font-mono tracking-widest uppercase">Japan Edition</span>
                 <span class="text-lg">🍁</span>
             </div>
             
@@ -240,49 +230,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Application Logic -->
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playBeep(freq = 600, duration = 0.1) {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-        }
-
-        // BGM Toggle Function
-        let isPlaying = false;
-        function toggleMusic() {
-            const audio = document.getElementById('bgm-audio');
-            const musicText = document.getElementById('music-text');
-            const musicIcon = document.getElementById('music-icon');
-
-            if (!isPlaying) {
-                audio.play().then(() => {
-                    isPlaying = true;
-                    musicText.innerText = "Matikan Musik 🎵";
-                    musicIcon.className = "fa-solid fa-volume-high text-maple animate-pulse";
-                }).catch(e => {
-                    console.log("Audio play blocked", e);
-                });
-            } else {
-                audio.pause();
-                isPlaying = false;
-                musicText.innerText = "Putar Musik Jepang 🍁";
-                musicIcon.className = "fa-solid fa-music text-autumn-600";
-            }
-        }
-
         let items = [
             { name: "JGC 1", amount: 50000 },
             { name: "Tol 1", amount: 60000 },
@@ -332,21 +280,18 @@
                 nameInput.value = '';
                 amountInput.value = '';
                 renderItems();
-                playBeep(800, 0.08);
             }
         }
 
         function removeItem(index) {
             items.splice(index, 1);
             renderItems();
-            playBeep(400, 0.08);
         }
 
         function copyGoPay() {
             navigator.clipboard.writeText("081389918087");
             const btnText = document.getElementById('copy-btn-text');
             btnText.innerText = 'Tersalin!';
-            playBeep(900, 0.12);
 
             setTimeout(() => {
                 btnText.innerText = 'Salin';
@@ -372,8 +317,6 @@
         }
 
         function triggerSuccessModal() {
-            playBeep(1000, 0.2);
-
             confetti({
                 particleCount: 80,
                 spread: 70,
