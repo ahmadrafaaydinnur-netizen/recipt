@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt Pembayaran Rafa - Dedicated to Manda</title>
+    <title>Bill & Receipt - Dedicated to Manda</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Zen Maru Gothic & Space Mono -->
+    <!-- Google Fonts: Playfair Display, Zen Maru Gothic, Space Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Space+Mono:wght@400;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Canvas Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
@@ -21,24 +21,15 @@
                 extend: {
                     colors: {
                         autumn: {
-                            50: '#fdfbf7',
-                            100: '#f7f1e5',
-                            200: '#eddcb9',
-                            300: '#e1bf84',
-                            400: '#d59e51',
-                            500: '#c57c2c',
-                            600: '#ab5d22',
-                            700: '#8b431e',
-                            800: '#71361f',
-                            900: '#5c2d1d',
-                        },
-                        maple: {
-                            light: '#e05a47',
-                            DEFAULT: '#c0392b',
-                            dark: '#962d22'
+                            gold: '#d4af37',
+                            darkgold: '#aa820a',
+                            leather: '#2c1810',
+                            paper: '#fdfbf7',
+                            wood: '#1a0f0a'
                         }
                     },
                     fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
                         mono: ['"Space Mono"', 'monospace'],
                         japanese: ['"Zen Maru Gothic"', 'sans-serif'],
                     }
@@ -48,29 +39,29 @@
     </script>
     <style>
         body {
-            background: linear-gradient(135deg, #f7f1e5 0%, #eddcb9 50%, #e1bf84 100%);
+            background: #120a07;
+            background-image: radial-gradient(#2c1810 1px, transparent 0);
+            background-size: 24px 24px;
             font-family: 'Zen Maru Gothic', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
         }
 
-        .receipt-container {
-            position: relative;
-            background: #fffdf9;
-            box-shadow: 0 20px 40px rgba(113, 54, 31, 0.15), 0 2px 6px rgba(0,0,0,0.05);
-            border-top: 6px solid #c57c2c;
+        .book-wrapper {
+            perspective: 1200px;
         }
 
-        .receipt-zigzag {
-            position: absolute;
-            bottom: -15px;
-            left: 0;
-            width: 100%;
-            height: 15px;
-            background: linear-gradient(-45deg, transparent 10px, #fffdf9 0), linear-gradient(45deg, transparent 10px, #fffdf9 0);
-            background-repeat: repeat-x;
-            background-size: 16px 16px;
+        .book-cover {
+            background: linear-gradient(135deg, #3a2016 0%, #1a0f0a 100%);
+            border: 2px solid #d4af37;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.2);
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform-origin: left center;
+        }
+
+        .receipt-inside {
+            background: #fdfbf7;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .maple-leaf {
@@ -87,146 +78,160 @@
             50% { transform: translateY(50vh) rotate(180deg) translateX(50px); }
             100% { transform: translateY(105vh) rotate(360deg) translateX(-30px); opacity: 0.2; }
         }
-
-        .hanko-stamp {
-            border: 3px solid #c0392b;
-            color: #c0392b;
-            border-radius: 8px;
-            padding: 2px 8px;
-            font-weight: bold;
-            display: inline-block;
-            transform: rotate(-8deg);
-            box-shadow: 0 0 2px rgba(192, 57, 43, 0.3);
-            opacity: 0.85;
-        }
     </style>
 </head>
-<body class="py-10 px-4 flex flex-col justify-center items-center">
+<body class="py-8 px-4 flex flex-col justify-center items-center min-h-screen">
 
-    <!-- ELEMEN AUDIO AUTO-PLAY (Sudah diset ke lagujepang.mp3) -->
-    <audio id="bgm" autoplay loop preload="auto">
+    <!-- ELEMEN AUDIO BGM -->
+    <audio id="bgm" loop preload="auto">
         <source src="lagujepang.mp3" type="audio/mpeg">
     </audio>
 
     <!-- Container Daun Gugur -->
     <div id="leaves-container"></div>
 
-    <!-- Main Receipt Card -->
-    <div class="receipt-container w-full max-w-md p-6 sm:p-8 rounded-t-xl z-10 my-auto">
+    <!-- 3D BOOK HOLDER -->
+    <div class="book-wrapper w-full max-w-md relative z-10 my-auto">
         
-        <!-- Top Header & Japanese Deco -->
-        <div class="text-center pb-6 border-b-2 border-dashed border-autumn-300 relative">
-            <div class="flex justify-between items-center mb-2">
-                <span class="hanko-stamp text-xs">秋 Aki</span>
-                <span class="text-xs text-autumn-600 font-mono tracking-widest uppercase">Japan Autumn Edition</span>
-                <span class="text-lg">🍁</span>
+        <!-- COVER BUKU TERTUTUP -->
+        <div id="cover-screen" onclick="openBook()" class="book-cover cursor-pointer rounded-r-2xl rounded-l-md p-8 text-center text-autumn-gold flex flex-col justify-between items-center min-h-[520px] relative z-20">
+            
+            <div class="w-full border-b border-autumn-gold/30 pb-4 flex justify-between items-center text-xs tracking-widest font-mono">
+                <span>FOLDER #0813</span>
+                <span>秋 AKI EDITION</span>
             </div>
-            
-            <h1 class="text-2xl font-extrabold text-autumn-900 tracking-wider font-mono uppercase mt-1">RECEIPT PEMBAYARAN RAFA</h1>
-            <p class="text-xs font-semibold text-autumn-600 tracking-widest mt-1">FOR MANDA ♡</p>
-            
-            <div class="mt-4 bg-autumn-50 p-2.5 rounded-lg border border-autumn-200 text-left text-xs text-autumn-800 font-mono space-y-1">
-                <div class="flex justify-between">
-                    <span>Kasir: Rafa</span>
-                    <span id="current-date">00/00/0000</span>
+
+            <div class="my-auto space-y-4">
+                <div class="w-20 h-20 mx-auto rounded-full border-2 border-autumn-gold flex items-center justify-center text-3xl bg-autumn-wood/50 shadow-inner">
+                    🍁
                 </div>
-                <div class="flex justify-between text-maple font-semibold">
-                    <span>Status:</span>
-                    <span>Rafa<span>
+                <h1 class="text-3xl font-serif font-bold tracking-wider text-autumn-gold uppercase">TAGIHAN RAFA</h1>
+                <p class="text-xs tracking-widest font-mono text-autumn-gold/80">JAPANESE AUTUMN BOOK</p>
+                
+                <div class="pt-6">
+                    <span class="inline-flex items-center gap-2 bg-autumn-gold text-autumn-leather text-xs font-bold px-5 py-2.5 rounded-full shadow-lg animate-bounce">
+                        <i class="fa-solid fa-book-open"></i> Buka Buku Tagihan
+                    </span>
                 </div>
+            </div>
+
+            <div class="w-full border-t border-autumn-gold/30 pt-4 text-[10px] font-mono text-autumn-gold/60">
+                Khusus Manda ♡
             </div>
         </div>
 
-        <!-- Items Table -->
-        <div class="py-6 border-b-2 border-dashed border-autumn-300">
-            <div class="flex justify-between text-xs font-bold text-autumn-700 uppercase font-mono pb-2">
-                <span>Rincian Talangan</span>
-                <span>Jumlah (IDR)</span>
-            </div>
-
-            <div id="item-list" class="space-y-3 font-mono text-sm">
-                <!-- Items inserted dynamically -->
-            </div>
-
-            <!-- Form Tambah Item -->
-            <div class="mt-6 bg-autumn-50 p-3 rounded-lg border border-autumn-200">
-                <p class="text-xs font-bold text-autumn-800 mb-2 font-mono flex items-center">
-                    <i class="fa-solid fa-plus-circle text-autumn-600 mr-1.5"></i> Tambah Item Baru
-                </p>
-                <div class="flex gap-2 mb-2">
-                    <input type="text" id="input-name" placeholder="Nama item (mis: Parkir)" class="w-full text-xs p-2 rounded border border-autumn-300 focus:outline-none focus:ring-1 focus:ring-autumn-500 bg-white">
-                    <input type="number" id="input-amount" placeholder="Rp" class="w-28 text-xs p-2 rounded border border-autumn-300 focus:outline-none focus:ring-1 focus:ring-autumn-500 bg-white">
-                </div>
-                <button onclick="addItem()" class="w-full bg-autumn-600 hover:bg-autumn-700 text-white text-xs font-bold py-1.5 rounded transition flex justify-center items-center gap-1">
-                    <i class="fa-solid fa-check"></i> Tambahkan
-                </button>
-            </div>
-        </div>
-
-        <!-- Total Calculation -->
-        <div class="py-4 border-b-2 border-dashed border-autumn-300 space-y-2">
-            <div class="flex justify-between text-sm text-autumn-800 font-mono">
-                <span>Subtotal</span>
-                <span id="subtotal-val">Rp 0</span>
-            </div>
-            <div class="flex justify-between text-sm text-autumn-800 font-mono">
-                <span>Pajak (0%)</span>
-                <span>Rp 0</span>
-            </div>
-            <div class="flex justify-between text-lg font-bold text-autumn-900 font-mono pt-2 border-t border-autumn-200">
-                <span>TOTAL DIBAYAR</span>
-                <span id="total-val" class="text-maple">Rp 0</span>
-            </div>
-        </div>
-
-        <!-- Payment Method Section -->
-        <div class="pt-5 text-center">
-            <p class="text-xs font-bold text-autumn-700 uppercase tracking-wider mb-2 font-mono">Metode Pembayaran</p>
+        <!-- ISI BUKU / RECEIPT -->
+        <div id="book-content" class="receipt-inside rounded-r-xl rounded-l-md p-6 sm:p-8 hidden text-gray-800 relative z-10">
             
-            <div class="bg-gradient-to-r from-blue-50 to-sky-50 border border-sky-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-sky-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
-                        <i class="fa-solid fa-wallet"></i>
+            <!-- Top Header -->
+            <div class="text-center pb-5 border-b border-gray-300">
+                <div class="flex justify-between items-center text-xs font-serif text-autumn-darkgold mb-1">
+                    <span>- 秋 - Aki Edition</span>
+                    <span>Autumn 2026</span>
+                </div>
+                <h2 class="text-xl font-bold font-serif tracking-wider text-autumn-leather uppercase">TAGIHAN TALANGAN RAFA</h2>
+                <p class="text-[11px] font-mono text-gray-500 mt-0.5">Bill Dedicated to Manda</p>
+                
+                <div class="mt-3 bg-autumn-paper p-2.5 rounded border border-gray-200 text-left text-xs font-mono space-y-1">
+                    <div class="flex justify-between">
+                        <span>Kasir: Rafa</span>
+                        <span id="current-date">00/00/0000</span>
                     </div>
-                    <div class="text-left">
-                        <p class="text-xs font-bold text-sky-900">GoPay (Rafa)</p>
-                        <p class="text-sm font-mono font-bold text-gray-800">081389918087</p>
+                    <div class="flex justify-between text-autumn-darkgold font-semibold">
+                        <span>Status:</span>
+                        <span>Rafa butuh uang buat jajan</span>
                     </div>
                 </div>
-                <button onclick="copyGoPay()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1">
-                    <i class="fa-regular fa-copy"></i>
-                    <span id="copy-btn-text">Salin</span>
-                </button>
             </div>
 
-            <!-- Action Button -->
-            <button onclick="triggerSuccessModal()" class="w-full mt-5 bg-gradient-to-r from-autumn-600 to-maple text-white font-bold py-3.5 px-4 rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition flex items-center justify-center gap-2 text-sm tracking-wide">
-                <span>🍁 KONFIRMASI SUDAH BAYAR</span>
-            </button>
-            
-            <p class="text-[10px] text-autumn-500 font-mono mt-3">Terima kasih banyak Manda • ありがとうございます</p>
-        </div>
+            <!-- Items Table -->
+            <div class="py-5 border-b border-gray-300">
+                <div class="flex justify-between text-xs font-bold text-gray-600 uppercase font-mono pb-2">
+                    <span>Rincian Talangan</span>
+                    <span>Harga (IDR)</span>
+                </div>
 
-        <!-- Receipt Zigzag Bottom -->
-        <div class="receipt-zigzag"></div>
+                <div id="item-list" class="space-y-2.5 font-mono text-xs">
+                    <!-- Items inserted dynamically -->
+                </div>
+
+                <!-- Form Tambah Item -->
+                <div class="mt-4 bg-gray-50 p-2.5 rounded border border-gray-200">
+                    <p class="text-[11px] font-bold text-gray-700 mb-1.5 font-mono flex items-center">
+                        <i class="fa-solid fa-plus-circle text-autumn-darkgold mr-1"></i> Tambah Item Baru
+                    </p>
+                    <div class="flex gap-2 mb-1.5">
+                        <input type="text" id="input-name" placeholder="Nama item" class="w-full text-xs p-1.5 rounded border border-gray-300 bg-white">
+                        <input type="number" id="input-amount" placeholder="Rp" class="w-24 text-xs p-1.5 rounded border border-gray-300 bg-white">
+                    </div>
+                    <button onclick="addItem()" class="w-full bg-autumn-leather hover:bg-black text-autumn-gold text-xs font-bold py-1 rounded transition">
+                        Tambahkan Item
+                    </button>
+                </div>
+            </div>
+
+            <!-- Total Calculation -->
+            <div class="py-4 border-b border-gray-300 space-y-1.5 font-mono text-xs">
+                <div class="flex justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span id="subtotal-val">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                    <span>Pajak Kasih Sayang (0%)</span>
+                    <span>Rp 0</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-autumn-leather pt-2 border-t border-gray-200">
+                    <span>TOTAL DIBAYAR</span>
+                    <span id="total-val" class="text-autumn-darkgold">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Payment Method Section -->
+            <div class="pt-4 text-center">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 font-mono">Metode Pembayaran</p>
+                
+                <div class="bg-blue-50/70 border border-blue-200 rounded-lg p-3 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-8 h-8 bg-sky-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-[10px] font-bold text-sky-900">GoPay (Rafa)</p>
+                            <p class="text-xs font-mono font-bold text-gray-800">081389918087</p>
+                        </div>
+                    </div>
+                    <button onclick="copyGoPay()" class="bg-sky-600 hover:bg-sky-700 text-white text-[11px] px-2.5 py-1.5 rounded font-bold transition flex items-center gap-1">
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="copy-btn-text">Salin</span>
+                    </button>
+                </div>
+
+                <!-- Action Button -->
+                <button onclick="triggerSuccessModal()" class="w-full mt-4 bg-gradient-to-r from-autumn-leather to-black text-autumn-gold font-serif font-bold py-3 px-4 rounded-lg shadow-md hover:brightness-125 active:scale-95 transition flex items-center justify-center gap-2 text-xs border border-autumn-gold/40">
+                    <span>🍁 KONFIRMASI SUDAH BAYAR</span>
+                </button>
+                
+                <p class="text-[9px] text-gray-400 font-mono mt-2.5">Terima kasih banyak Manda • ありがとうございます</p>
+            </div>
+        </div>
     </div>
 
     <!-- Success Modal -->
-    <div id="success-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl border-4 border-autumn-300 relative transform transition-all scale-95 opacity-0" id="modal-content">
+    <div id="success-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl max-w-sm w-full p-6 text-center shadow-2xl border-2 border-autumn-gold relative transform transition-all scale-95 opacity-0" id="modal-content">
             
-            <div class="w-16 h-16 bg-autumn-100 text-autumn-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner border border-autumn-300">
+            <div class="w-14 h-14 bg-autumn-paper text-autumn-darkgold rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner border border-autumn-gold">
                 🍁
             </div>
 
-            <h2 class="text-xl font-extrabold text-autumn-900 font-japanese">Arigatou Gozaimasu!</h2>
-            <p class="text-xs text-autumn-600 font-mono mt-1">ありがとうございます 🌸</p>
+            <h2 class="text-lg font-bold text-autumn-leather font-serif">Arigatou Gozaimasu!</h2>
+            <p class="text-xs text-gray-500 font-mono">ありがとうございます 🌸</p>
 
-            <div class="my-4 p-4 bg-autumn-50 rounded-xl border border-autumn-200 text-autumn-800 text-sm leading-relaxed">
-                "Makasih banyak ya Manda!❤️"
+            <div class="my-4 p-3 bg-autumn-paper rounded border border-gray-200 text-autumn-leather text-xs leading-relaxed">
+                "Makasih banyak ya Manda! ❤️"
             </div>
 
-            <button onclick="closeModal()" class="w-full bg-autumn-700 hover:bg-autumn-800 text-white font-bold py-2.5 rounded-xl transition text-sm">
+            <button onclick="closeModal()" class="w-full bg-autumn-leather text-autumn-gold font-bold py-2 rounded transition text-xs">
                 Sama-Sama Rafa! 😊
             </button>
         </div>
@@ -234,42 +239,31 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        let audioCtx;
-
-        function playBeep(freq = 600, duration = 0.1) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-        }
-
-        // Trik Auto-play BGM saat halaman dibuka/disentuh pertama kali
-        window.addEventListener('load', () => {
-            const bgm = document.getElementById('bgm');
-            bgm.play().catch(() => {
-                document.body.addEventListener('click', () => {
-                    bgm.play();
-                }, { once: true });
-            });
-        });
-
+        // Daftar item awal ditambah "Cuci Mobil"
         let items = [
             { name: "JGC 1", amount: 50000 },
             { name: "Tol 1", amount: 60000 },
             { name: "Jajan", amount: 50000 },
             { name: "JGC 2", amount: 50000 },
             { name: "Tol 2", amount: 30000 },
-            { name: "JGC 3", amount: 50000 }
+            { name: "JGC 3", amount: 50000 },
+            { name: "Cuci Mobil", amount: 50000 }
         ];
+
+        function openBook() {
+            const bgm = document.getElementById('bgm');
+            bgm.play().catch(e => console.log(e));
+
+            document.getElementById('cover-screen').classList.add('hidden');
+            document.getElementById('book-content').classList.remove('hidden');
+
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.5 },
+                colors: ['#d4af37', '#2c1810', '#c0392b']
+            });
+        }
 
         function formatRupiah(number) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
@@ -283,15 +277,15 @@
             items.forEach((item, index) => {
                 total += item.amount;
                 const row = document.createElement('div');
-                row.className = 'flex justify-between items-center bg-autumn-50/50 p-2 rounded border border-autumn-100/60';
+                row.className = 'flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200';
                 row.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <button onclick="removeItem(${index})" class="text-red-400 hover:text-red-600 text-xs transition px-1" title="Hapus">
+                        <button onclick="removeItem(${index})" class="text-red-400 hover:text-red-600 text-xs px-1" title="Hapus">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
-                        <span class="text-autumn-900 font-medium">${item.name}</span>
+                        <span class="text-gray-800 font-medium">${item.name}</span>
                     </div>
-                    <span class="text-autumn-800 font-bold">${formatRupiah(item.amount)}</span>
+                    <span class="text-gray-900 font-bold">${formatRupiah(item.amount)}</span>
                 `;
                 listEl.appendChild(row);
             });
@@ -311,21 +305,18 @@
                 nameInput.value = '';
                 amountInput.value = '';
                 renderItems();
-                playBeep(800, 0.08);
             }
         }
 
         function removeItem(index) {
             items.splice(index, 1);
             renderItems();
-            playBeep(400, 0.08);
         }
 
         function copyGoPay() {
             navigator.clipboard.writeText("081389918087");
             const btnText = document.getElementById('copy-btn-text');
             btnText.innerText = 'Tersalin!';
-            playBeep(900, 0.12);
 
             setTimeout(() => {
                 btnText.innerText = 'Salin';
@@ -335,7 +326,7 @@
         function createAutumnLeaves() {
             const container = document.getElementById('leaves-container');
             const leafIcons = ['🍁', '🍂'];
-            const leafCount = 15;
+            const leafCount = 12;
 
             for (let i = 0; i < leafCount; i++) {
                 const leaf = document.createElement('div');
@@ -345,19 +336,17 @@
                 leaf.style.animationDuration = (Math.random() * 5 + 6) + 's';
                 leaf.style.animationDelay = (Math.random() * 5) + 's';
                 leaf.style.fontSize = (Math.random() * 12 + 16) + 'px';
-                leaf.style.opacity = Math.random() * 0.7 + 0.3;
+                leaf.style.opacity = Math.random() * 0.5 + 0.2;
                 container.appendChild(leaf);
             }
         }
 
         function triggerSuccessModal() {
-            playBeep(1000, 0.2);
-
             confetti({
                 particleCount: 80,
                 spread: 70,
                 origin: { y: 0.6 },
-                colors: ['#c57c2c', '#c0392b', '#eddcb9', '#8b431e']
+                colors: ['#d4af37', '#c0392b', '#2c1810']
             });
 
             const modal = document.getElementById('success-modal');
