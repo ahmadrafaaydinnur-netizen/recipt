@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Playfair Display, Zen Maru Gothic, Space Mono -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Space+Mono:wght@400;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
@@ -47,21 +47,38 @@
             overflow-x: hidden;
         }
 
-        .book-wrapper {
-            perspective: 1200px;
+        .book-stage {
+            perspective: 2500px;
         }
 
+        /* Cover Buku dengan Efek Lipatan & Bayangan 3D Super Smooth */
         .book-cover {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(135deg, #3a2016 0%, #1a0f0a 100%);
             border: 2px solid #d4af37;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.2);
-            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            box-shadow: -15px 25px 50px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(212, 175, 55, 0.25);
             transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 1.4s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s ease 0.7s;
+            will-change: transform, opacity;
+            z-index: 30;
+            backface-visibility: hidden;
         }
 
+        .book-cover.opened {
+            transform: rotateY(-135deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Efek Tumpukan Halaman di Bawah Resi */
         .receipt-inside {
             background: #fdfbf7;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 5px 5px 0px #e1bf84, 10px 10px 0px #f7f1e5, 0 20px 40px rgba(0,0,0,0.6);
+            border-left: 6px solid #2c1810;
         }
 
         .maple-leaf {
@@ -82,19 +99,27 @@
 </head>
 <body class="py-8 px-4 flex flex-col justify-center items-center min-h-screen">
 
-    <!-- ELEMEN AUDIO BGM -->
+    <!-- ELEMEN AUDIO BGM (lagujepang.mp3) -->
     <audio id="bgm" loop preload="auto">
         <source src="lagujepang.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Kontrol Musik Melayang di Pojok Kanan Atas -->
+    <div class="fixed top-4 right-4 z-50">
+        <button onclick="toggleMusic()" id="music-btn" class="bg-autumn-leather border border-autumn-gold text-autumn-gold text-xs px-3 py-2 rounded-full shadow-lg flex items-center gap-1.5 hover:bg-black transition">
+            <i class="fa-solid fa-music" id="music-icon"></i>
+            <span id="music-text" class="font-mono">Music: Off</span>
+        </button>
+    </div>
+
     <!-- Container Daun Gugur -->
     <div id="leaves-container"></div>
 
-    <!-- 3D BOOK HOLDER -->
-    <div class="book-wrapper w-full max-w-md relative z-10 my-auto">
+    <!-- MAIN CONTAINER (Fixed Size, Single Screen) -->
+    <div class="book-stage w-full max-w-md relative z-10 my-auto min-h-[580px]">
         
-        <!-- COVER BUKU TERTUTUP -->
-        <div id="cover-screen" onclick="openBook()" class="book-cover cursor-pointer rounded-r-2xl rounded-l-md p-8 text-center text-autumn-gold flex flex-col justify-between items-center min-h-[520px] relative z-20">
+        <!-- COVER BUKU (Numpuk Pas di Atas Resi) -->
+        <div id="cover-screen" onclick="openBook()" class="book-cover cursor-pointer rounded-r-2xl rounded-l-md p-8 text-center text-autumn-gold flex flex-col justify-between items-center">
             
             <div class="w-full border-b border-autumn-gold/30 pb-4 flex justify-between items-center text-xs tracking-widest font-mono">
                 <span>FOLDER #0813</span>
@@ -109,7 +134,7 @@
                 <p class="text-xs tracking-widest font-mono text-autumn-gold/80">JAPANESE AUTUMN BOOK</p>
                 
                 <div class="pt-6">
-                    <span class="inline-flex items-center gap-2 bg-autumn-gold text-autumn-leather text-xs font-bold px-5 py-2.5 rounded-full shadow-lg animate-bounce">
+                    <span class="inline-flex items-center gap-2 bg-autumn-gold text-autumn-leather text-xs font-bold px-6 py-3 rounded-full shadow-lg animate-bounce">
                         <i class="fa-solid fa-book-open"></i> Buka Buku Tagihan
                     </span>
                 </div>
@@ -120,38 +145,38 @@
             </div>
         </div>
 
-        <!-- ISI BUKU / RECEIPT -->
-        <div id="book-content" class="receipt-inside rounded-r-xl rounded-l-md p-6 sm:p-8 hidden text-gray-800 relative z-10">
+        <!-- ISI BUKU / RESI (Di Belakang Cover) -->
+        <div id="book-content" class="receipt-inside rounded-r-xl rounded-l-md p-6 sm:p-8 text-gray-800 relative z-10 min-h-[580px] flex flex-col justify-between">
             
             <!-- Top Header -->
-            <div class="text-center pb-5 border-b border-gray-300">
+            <div class="text-center pb-4 border-b border-gray-300">
                 <div class="flex justify-between items-center text-xs font-serif text-autumn-darkgold mb-1">
                     <span>- 秋 - Aki Edition</span>
                     <span>Autumn 2026</span>
                 </div>
-                <h2 class="text-xl font-bold font-serif tracking-wider text-autumn-leather uppercase">TAGIHAN TALANGAN RAFA</h2>
+                <h2 class="text-xl font-bold font-serif tracking-wider text-autumn-leather uppercase">RAFA</h2>
                 <p class="text-[11px] font-mono text-gray-500 mt-0.5">Bill Dedicated to Manda</p>
                 
                 <div class="mt-3 bg-autumn-paper p-2.5 rounded border border-gray-200 text-left text-xs font-mono space-y-1">
                     <div class="flex justify-between">
-                        <span>Kasir: Rafa</span>
+                        <span>Rafa</span>
                         <span id="current-date">00/00/0000</span>
                     </div>
                     <div class="flex justify-between text-autumn-darkgold font-semibold">
                         <span>Status:</span>
-                        <span>Rafa butuh uang buat jajan</span>
+                        <span></span>
                     </div>
                 </div>
             </div>
 
             <!-- Items Table -->
-            <div class="py-5 border-b border-gray-300">
+            <div class="py-4 border-b border-gray-300 my-auto">
                 <div class="flex justify-between text-xs font-bold text-gray-600 uppercase font-mono pb-2">
                     <span>Rincian Talangan</span>
                     <span>Harga (IDR)</span>
                 </div>
 
-                <div id="item-list" class="space-y-2.5 font-mono text-xs">
+                <div id="item-list" class="space-y-2 font-mono text-xs">
                     <!-- Items inserted dynamically -->
                 </div>
 
@@ -171,7 +196,7 @@
             </div>
 
             <!-- Total Calculation -->
-            <div class="py-4 border-b border-gray-300 space-y-1.5 font-mono text-xs">
+            <div class="py-3 border-b border-gray-300 space-y-1 font-mono text-xs">
                 <div class="flex justify-between text-gray-600">
                     <span>Subtotal</span>
                     <span id="subtotal-val">Rp 0</span>
@@ -180,17 +205,15 @@
                     <span>Pajak Kasih Sayang (0%)</span>
                     <span>Rp 0</span>
                 </div>
-                <div class="flex justify-between text-sm font-bold text-autumn-leather pt-2 border-t border-gray-200">
+                <div class="flex justify-between text-sm font-bold text-autumn-leather pt-1.5 border-t border-gray-200">
                     <span>TOTAL DIBAYAR</span>
                     <span id="total-val" class="text-autumn-darkgold">Rp 0</span>
                 </div>
             </div>
 
             <!-- Payment Method Section -->
-            <div class="pt-4 text-center">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 font-mono">Metode Pembayaran</p>
-                
-                <div class="bg-blue-50/70 border border-blue-200 rounded-lg p-3 flex items-center justify-between shadow-sm">
+            <div class="pt-3 text-center">
+                <div class="bg-blue-50/70 border border-blue-200 rounded-lg p-2.5 flex items-center justify-between shadow-sm">
                     <div class="flex items-center space-x-2.5">
                         <div class="w-8 h-8 bg-sky-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
                             <i class="fa-solid fa-wallet"></i>
@@ -207,11 +230,9 @@
                 </div>
 
                 <!-- Action Button -->
-                <button onclick="triggerSuccessModal()" class="w-full mt-4 bg-gradient-to-r from-autumn-leather to-black text-autumn-gold font-serif font-bold py-3 px-4 rounded-lg shadow-md hover:brightness-125 active:scale-95 transition flex items-center justify-center gap-2 text-xs border border-autumn-gold/40">
+                <button onclick="triggerSuccessModal()" class="w-full mt-3 bg-gradient-to-r from-autumn-leather to-black text-autumn-gold font-serif font-bold py-3 px-4 rounded-lg shadow-md hover:brightness-125 active:scale-95 transition flex items-center justify-center gap-2 text-xs border border-autumn-gold/40">
                     <span>🍁 KONFIRMASI SUDAH BAYAR</span>
                 </button>
-                
-                <p class="text-[9px] text-gray-400 font-mono mt-2.5">Terima kasih banyak Manda • ありがとうございます</p>
             </div>
         </div>
     </div>
@@ -219,18 +240,14 @@
     <!-- Success Modal -->
     <div id="success-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-xl max-w-sm w-full p-6 text-center shadow-2xl border-2 border-autumn-gold relative transform transition-all scale-95 opacity-0" id="modal-content">
-            
             <div class="w-14 h-14 bg-autumn-paper text-autumn-darkgold rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner border border-autumn-gold">
                 🍁
             </div>
-
             <h2 class="text-lg font-bold text-autumn-leather font-serif">Arigatou Gozaimasu!</h2>
             <p class="text-xs text-gray-500 font-mono">ありがとうございます 🌸</p>
-
             <div class="my-4 p-3 bg-autumn-paper rounded border border-gray-200 text-autumn-leather text-xs leading-relaxed">
                 "Makasih banyak ya Manda! ❤️"
             </div>
-
             <button onclick="closeModal()" class="w-full bg-autumn-leather text-autumn-gold font-bold py-2 rounded transition text-xs">
                 Sama-Sama Rafa! 😊
             </button>
@@ -239,7 +256,24 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        // Daftar item awal ditambah "Cuci Mobil"
+        let audioCtx;
+        function playTactileClick() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch(e) {}
+        }
+
         let items = [
             { name: "JGC 1", amount: 50000 },
             { name: "Tol 1", amount: 60000 },
@@ -251,18 +285,46 @@
         ];
 
         function openBook() {
+            playTactileClick();
             const bgm = document.getElementById('bgm');
-            bgm.play().catch(e => console.log(e));
+            bgm.play().then(() => {
+                updateMusicButton(true);
+            }).catch(e => console.log(e));
 
-            document.getElementById('cover-screen').classList.add('hidden');
-            document.getElementById('book-content').classList.remove('hidden');
+            const cover = document.getElementById('cover-screen');
+            cover.classList.add('opened');
 
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.5 },
-                colors: ['#d4af37', '#2c1810', '#c0392b']
-            });
+            setTimeout(() => {
+                confetti({
+                    particleCount: 60,
+                    spread: 70,
+                    origin: { y: 0.5 },
+                    colors: ['#d4af37', '#2c1810', '#c0392b']
+                });
+            }, 400);
+        }
+
+        function toggleMusic() {
+            playTactileClick();
+            const bgm = document.getElementById('bgm');
+            if (bgm.paused) {
+                bgm.play().then(() => updateMusicButton(true));
+            } else {
+                bgm.pause();
+                updateMusicButton(false);
+            }
+        }
+
+        function updateMusicButton(isPlaying) {
+            const icon = document.getElementById('music-icon');
+            const text = document.getElementById('music-text');
+            if (isPlaying) {
+                icon.className = "fa-solid fa-volume-high animate-pulse";
+                text.innerText = "Music: On";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark";
+                text.innerText = "Music: Off";
+            }
         }
 
         function formatRupiah(number) {
@@ -277,7 +339,7 @@
             items.forEach((item, index) => {
                 total += item.amount;
                 const row = document.createElement('div');
-                row.className = 'flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200';
+                row.className = 'flex justify-between items-center bg-gray-50 p-1.5 rounded border border-gray-200';
                 row.innerHTML = `
                     <div class="flex items-center gap-2">
                         <button onclick="removeItem(${index})" class="text-red-400 hover:text-red-600 text-xs px-1" title="Hapus">
@@ -295,6 +357,7 @@
         }
 
         function addItem() {
+            playTactileClick();
             const nameInput = document.getElementById('input-name');
             const amountInput = document.getElementById('input-amount');
             const name = nameInput.value.trim();
@@ -309,11 +372,13 @@
         }
 
         function removeItem(index) {
+            playTactileClick();
             items.splice(index, 1);
             renderItems();
         }
 
         function copyGoPay() {
+            playTactileClick();
             navigator.clipboard.writeText("081389918087");
             const btnText = document.getElementById('copy-btn-text');
             btnText.innerText = 'Tersalin!';
@@ -342,6 +407,7 @@
         }
 
         function triggerSuccessModal() {
+            playTactileClick();
             confetti({
                 particleCount: 80,
                 spread: 70,
@@ -361,6 +427,7 @@
         }
 
         function closeModal() {
+            playTactileClick();
             const modal = document.getElementById('success-modal');
             const content = document.getElementById('modal-content');
 
